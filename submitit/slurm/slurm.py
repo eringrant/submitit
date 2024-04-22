@@ -508,7 +508,12 @@ def _make_sbatch_string(
         stderr_flags = [] if stderr_to_stdout else ["--error", stderr]
         if srun_args is None:
             srun_args = []
-        srun_cmd = _shlex_join(["srun", "--unbuffered", "--output", stdout, *stderr_flags, *srun_args])
+        srun_cmd = _shlex_join([
+          "srun", 
+          "--exclusive",
+          f"--cpus-per-task={cpus_per_task}",
+          f"--ntasks={ntasks_per_node or 1}",
+          "--unbuffered", "--output", stdout, *stderr_flags, *srun_args])
         command = " ".join((srun_cmd, command))
 
     lines += [
